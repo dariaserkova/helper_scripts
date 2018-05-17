@@ -1,5 +1,23 @@
 #!/usr/bin/env python
+"""
+This is a draft of gitlab -> bitbucket migration script for gitlab project one by one
+Usage:  python migration.py <SAMI-GROUP> <BB-PROJECT> <FEATURES>
+Where
+FEATURES: Issues,MergeRequests,Pipelines,Snippets,Webhooks,Wiki
 
+Examples:
+•	Group with projects only with Pull-Requests, no more extra features
+python bulk_migration.py ls-infrastructure infra MergeRequests
+
+•	Group with projects with Issues and Snippets
+python bulk_migration.py ls-infrastructure infra Issues,Snippets
+
+•	Group with projects with everything
+python bulk_migration.py ls-infrastructure infra Issues,MergeRequests,Pipelines,Snippets,Webhooks,Wiki
+
+You can also specify <SAMI-GROUP>/<SAMI-PROJECT> if you want to migrate just one of them
+Run pip install -r pip-list to install all dependences
+"""
 import os
 import gitlab
 import git
@@ -100,7 +118,7 @@ def create_repo(project_name, repo_name):
 def add_remote_repo(repo, project_name, repo_name):
     remote_name = "bb_{}_{}".format(os.getpid(),repo_name)
     print(">>>>> Adding remote {} to origin on {} repo".format(remote_name, repo_name))
-    connection_string = "BITBUCKET_REPOURL/{}/{}".format(BITBUCKET_REPOURL, project_name,repo_name)
+    connection_string = "{}/{}/{}".format(BITBUCKET_REPOURL, project_name,repo_name)
     repo.remotes.origin.add(repo,remote_name,connection_string)
     return remote_name
 
@@ -166,11 +184,6 @@ def bb_push(group_project):
 
     #METADATA
     handle_metadata(features, bb_project_name, bb_repo_name, project)
-
-    #ARCHIVE PROJECT
-    # print(">>>>> Archiving {} repository".format(bb_repo_name))
-    # project.archive()
-
 
 def handle_metadata(features, project_name, repo_name, project):
     if len(features) != 0:
