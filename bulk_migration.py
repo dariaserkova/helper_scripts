@@ -23,6 +23,7 @@ try:
     GITLAB_TOKEN = cfg['GITLAB_TOKEN']
     GITLAB_ENDPOINT = cfg['GITLAB_ENDPOINT']
     BITBUCKET_ENDPOINT = cfg['BITBUCKET_ENDPOINT']
+    BITBUCKET_REPOURL = cfg['BITBUCKET_REPOURL']
     BITBUCKET_REST_URL = cfg['BITBUCKET_REST_URL']
     BITBUCKET_TOKEN = cfg['BITBUCKET_TOKEN']
     BITBUCKET_USER = cfg['BITBUCKET_USER']
@@ -99,7 +100,7 @@ def create_repo(project_name, repo_name):
 def add_remote_repo(repo, project_name, repo_name):
     remote_name = "bb_{}_{}".format(os.getpid(),repo_name)
     print(">>>>> Adding remote {} to origin on {} repo".format(remote_name, repo_name))
-    connection_string = "ssh://git@git.clarivate.io/{}/{}".format(project_name,repo_name)
+    connection_string = "BITBUCKET_REPOURL/{}/{}".format(BITBUCKET_REPOURL, project_name,repo_name)
     repo.remotes.origin.add(repo,remote_name,connection_string)
     return remote_name
 
@@ -129,7 +130,7 @@ def remove_repo(project):
 def metadata_dir(project_name, repo_name):
     print(">>>>> Creating metadata gitlab dir {}".format(METADATA_DIR))
     destination = os.path.join(TEMPORAL_PATH,project_name,repo_name)
-    repo_url = "ssh://git@git.clarivate.io/{}/{}".format(project_name,repo_name)
+    repo_url = "{}/{}/{}".format(BITBUCKET_REPOURL,project_name,repo_name)
     repo = git.Repo.clone_from(repo_url, destination)
     samidir = os.path.join(repo.working_dir,METADATA_DIR)
     os.mkdir(samidir)
