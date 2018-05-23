@@ -6,13 +6,13 @@ Where
 FEATURES: Issues,MergeRequests,Pipelines,Snippets,Webhooks,Wiki
 
 Examples:
-•	Group with projects only with Pull-Requests, no more extra features
+Group with projects only with Pull-Requests, no more extra features
 python bulk_migration.py ls-infrastructure infra MergeRequests
 
-•	Group with projects with Issues and Snippets
+Group with projects with Issues and Snippets
 python bulk_migration.py ls-infrastructure infra Issues,Snippets
 
-•	Group with projects with everything
+Group with projects with everything
 python bulk_migration.py ls-infrastructure infra Issues,MergeRequests,Pipelines,Snippets,Webhooks,Wiki
 
 You can also specify <SAMI-GROUP>/<SAMI-PROJECT> if you want to migrate just one of them
@@ -93,7 +93,7 @@ def create_repo(project_name, repo_name):
     project_url = BITBUCKET_REST_URL+'/projects/'+project_name
     project_exists = requests.get(project_url,auth=(BITBUCKET_USER,BITBUCKET_TOKEN))
     if project_exists.status_code != 200:
-        print(">>>>> Project {} does NOT exist on git.clarivate.io :-(\nPlease create it before migrating repos".format(project_name))
+        print(">>>>> Project {} does NOT exist on git..io :-(\nPlease create it before migrating repos".format(project_name))
         sys.exit(1)
 
     repo_url = BITBUCKET_REST_URL+'/projects/'+project_name+'/repos/'+repo_name
@@ -127,9 +127,12 @@ def add_remote_repo(repo, project_name, repo_name):
 ## Push repo to remote
 #########################
 def push_repo(repo,remote_name):
-    print(">>>>> Pushing {} to {} repo".format(repo.working_dir.split('/')[-1], remote_name))
-    remote_origin = repo.remotes[remote_name]
-    remote_origin.push(mirror=True)
+    try:
+        print(">>>>> Pushing {} to {} repo".format(repo.working_dir.split('/')[-1], remote_name))
+        remote_origin = repo.remotes[remote_name]
+        remote_origin.push(mirror=True)
+    except git.exc.GitCommandError:
+        print('>>>>> Some error on cloning, maybe, empty repo?')
 
 
 #########################
@@ -173,8 +176,8 @@ def bb_push(group_project):
     print(">>>>> Processing {} repository".format(bb_repo_name))
     if len(project.commits.list()) == 0:
         print(">>>>> Project {} is empty".format(bb_repo_name))
-        print(">>>>> Archiving {} project".format(bb_repo_name))
-        project.archive()
+        # print(">>>>> Archiving {} project".format(bb_repo_name))
+        # project.archive()
 
     cloned_repo = clone_repo(project)
     create_repo(bb_project_name, bb_repo_name)
@@ -302,6 +305,7 @@ def main():
     try:
         project = gitlab_conn.projects.get(gitlab_group_name + '/' + gitlab_project) #if we have this project in gitlab and specified in arguments we'll migrate only it
         bb_push(project)
+       #project.archive()
     except gitlab.exceptions.GitlabGetError:
         print(">>>>> There is no such a project {}\n".format(gitlab_project))
         sys.exit(1)
@@ -309,6 +313,7 @@ def main():
         print(">>>>> Project is undefined, begin for all projects")
         for project in gitlab_group.projects.list(all=True):
             bb_push(project)
+            #project.archive()
             time.sleep(1)
 
 
