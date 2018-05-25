@@ -16,7 +16,7 @@ try:
     with open("config.yml", 'r') as ymlfile:
         cfg = yaml.load(ymlfile)
 except IOError:
-    print('Can not find config.yml.yml in the current directory')
+    print('Can not find config.yml in the current directory')
     sys.exit(1)
 
 # jenkins url must be in config
@@ -24,7 +24,7 @@ try:
     j_url = cfg['jenkins_url']
     view = cfg['view']
 except KeyError, exc:
-    print("No such option in config.yml.yml - {}".format(str(exc)))
+    print("No such option in config.yml - {}".format(str(exc)))
     sys.exit(1)
 
 try:

@@ -35,7 +35,7 @@ try:
     with open("config.yml", 'r') as ymlfile:
         cfg = yaml.load(ymlfile)
 except IOError:
-    print('Can not find config.yml.yml in the current directory')
+    print('Can not find config.yml in the current directory')
     sys.exit(1)
 try:
     GITLAB_TOKEN = cfg['GITLAB_TOKEN']
@@ -48,7 +48,7 @@ try:
     TEMPORAL_PATH = cfg['TEMPORAL_PATH']
     METADATA_DIR = cfg['METADATA_DIR']
 except KeyError, exc:
-    print("No such option in config.yml.yml - {}".format(str(exc)))
+    print("No such option in config.yml - {}".format(str(exc)))
     sys.exit(1)
 
 #####################
