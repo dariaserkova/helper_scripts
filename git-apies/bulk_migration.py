@@ -29,7 +29,7 @@ import time
 import yaml
 
 #####################
-## Reading the configuration
+# Reading the configuration
 #####################
 try:
     with open("config.yml", 'r') as ymlfile:
@@ -52,7 +52,7 @@ except KeyError, exc:
     sys.exit(1)
 
 #####################
-## Connection
+# Connection
 #####################
 def connection():
     global gitlab_conn
@@ -61,7 +61,7 @@ def connection():
 
 
 #########################
-## Check if group exists
+# Check if group exists
 #########################
 def check_group(group_name):
     try:
@@ -72,7 +72,7 @@ def check_group(group_name):
 
 
 #########################
-## Clone git repo locally
+# Clone git repo locally
 #########################
 def clone_repo(project):
     destination = os.path.join(TEMPORAL_PATH,project.attributes.get('path_with_namespace'))
@@ -87,7 +87,7 @@ def clone_repo(project):
 
 
 #########################
-## Create remote repo in bitbucket
+# Create remote repo in bitbucket
 #########################
 def create_repo(project_name, repo_name):
     project_url = BITBUCKET_REST_URL+'/projects/'+project_name
@@ -113,7 +113,7 @@ def create_repo(project_name, repo_name):
 
 
 #########################
-## Add remote origin
+# Add remote origin
 #########################
 def add_remote_repo(repo, project_name, repo_name):
     remote_name = "bb_{}_{}".format(os.getpid(),repo_name)
@@ -124,7 +124,7 @@ def add_remote_repo(repo, project_name, repo_name):
 
 
 #########################
-## Push repo to remote
+# Push repo to remote
 #########################
 def push_repo(repo,remote_name):
     try:
@@ -146,7 +146,7 @@ def remove_repo(project):
  
 
 #########################
-## METADATA 
+# METADATA
 #########################
 def metadata_dir(project_name, repo_name):
     print(">>>>> Creating metadata gitlab dir {}".format(METADATA_DIR))
@@ -266,7 +266,7 @@ def handle_metadata(features, project_name, repo_name, project):
         metadata_remove(metadata_repo)
 
 #########################
-## main function
+# main function
 #########################
 def main():
     usage = 'Usage: python migration.py <SAMI-GROUP> <BB-PROJECT> <FEATURES>\nYou can also specify <SAMI-GROUP>/<SAMI-PROJECT> if you want to migrate just one of them'
@@ -318,7 +318,7 @@ def main():
 
 
 #####################
-## MAIN
+# MAIN
 #####################
 if __name__ == "__main__":
     main()

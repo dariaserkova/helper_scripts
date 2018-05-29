@@ -52,7 +52,7 @@ def rec_checker(api_ans):
     if not isinstance(api_ans, dict):
         print(type(api_ans))
         return None
-    if depth < 0:
+    if depth <= 0:
         return jobs
     depth -= 1
     if 'jobs' in api_ans:
@@ -103,7 +103,7 @@ else:
         props = re.search(job_conf_template, config.text)
         if props:
             t_items.append([job['name'], job['url'], props.group(0)])
-print_table.print_table(t_items, header=t_headers, wrap=False, max_col_width=35, wrap_style='wrap', row_line=True, fix_col_width=True)
+print_table.print_table(t_items, header=t_headers, wrap=False, max_col_width=55, wrap_style='wrap', row_line=True, fix_col_width=False)
 
 
 
