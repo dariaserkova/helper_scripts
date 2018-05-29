@@ -1,5 +1,7 @@
 #!/usr/bin/env python
-'''Documentation to be written'''
+'''
+Documentation to be written
+'''
 
 
 import getpass
@@ -11,7 +13,7 @@ import json
 import print_table
 
 #####################
-## Reading the configuration
+# Reading the configuration
 #####################
 try:
     with open("config.yml", 'r') as ymlfile:
@@ -40,9 +42,12 @@ except KeyError: #if not in config, could be provided via stdin
 
 global jobs
 
+
 def rec_checker(api_ans):
-    '''gets json as a parametr
-    returns list of jobs'''
+    '''
+    gets json as a parametr
+    returns list of jobs
+    '''
     if not isinstance(api_ans, dict):
         print(type(api_ans))
         return None
@@ -51,8 +56,13 @@ def rec_checker(api_ans):
             if 'FreeStyleProject' in job['_class'] or 'MavenModuleSet' in job['_class']:
                 jobs.append(job)
             elif 'Folder' in job['_class']:
-                print("Omiting folder {}".format(job['name'])) # to do: handle with folders
-                pass
+                nested = requests.get(job['url'] + '/api/json', auth=(user, token))
+                contents = json.loads(nested.text)
+                if contents['primaryView'] in contents['views']:  # we have url on view itself in view field in folder
+                    contents['views'].remove(contents['primaryView'])  # json output so we need to remove it
+                    del contents['primaryView']
+                    print("Original view name removed for {}".format(contents['name']))
+                rec_checker(contents)
     if 'views' in api_ans:
         print('Found nested view')
         for view in api_ans['views']:
@@ -61,20 +71,14 @@ def rec_checker(api_ans):
     return jobs
 
 
-
-
 # go through views
 main_url = j_url + '/view/' + view
 main_view = requests.get(main_url + '/api/json', auth=(user, token))
 views = json.loads(main_view.text)
 jobs = []
-jobs.extend(rec_checker(views))
-# print('|Job name \t |Job url \t |Properties file path|')
+jobs.extend(rec_checker(views))  # get the list of jobs
 t_headers = ['Job name', 'Job url', "Matched with {}".format(job_conf_template)]
 t_items = []
-# for item in views:
-#     nested = requests.get(item['url'] + '/api/json', auth=(user, token))
-#     jobs = json.loads(nested.text)['jobs']
 if job_name_template != '' and job_conf_template != '':
     for job in jobs:
         if re.search(job_name_template, job['name']):
@@ -82,7 +86,6 @@ if job_name_template != '' and job_conf_template != '':
             props = re.search(job_conf_template, config.text)
             if props:
                 t_items.append([job['name'], job['url'], props.group(0)])
-                # print('|' + job['name'] + '\t' + '|' + job['url'] + '\t' + '|' + props.group(0) + '|')
             else:
                 t_items.append([job['name'], job['url'], 'Nope'])
 elif job_conf_template == '' and job_name_template == '':
