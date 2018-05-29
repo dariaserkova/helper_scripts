@@ -1,6 +1,16 @@
 #!/usr/bin/env python
+
 '''
-Documentation to be written
+Gets the list of jenkins jobs due to some criteria, which's defined in config file
+config sample:
+jenkins_url: 'http(s)://your_jenkins.server'
+user: 'username'
+token: 'jenkins api token'
+view: 'view_name' # if you want view in view just write external_view/view/internal_view here
+job_name_template: 'job name mask' # if you want a list of jobs which contain some template in name, specify the template here, you can use regular expressions
+job_conf_template: '(?<=you can use ahead search\>)[\w\d\.]+' # if you want a list of jobs which contain some template
+# in config.xml, specify the template here. you can use regular expressions
+search_depth: 3 # how far do you want to go through folders and views
 '''
 
 
