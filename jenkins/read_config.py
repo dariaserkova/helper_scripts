@@ -6,7 +6,7 @@ import yaml
 import getpass
 
 
-def main():
+def read():
     try:
         with open("config.yml", 'r') as ymlfile:
             cfg = yaml.load(ymlfile)
@@ -25,8 +25,8 @@ def main():
     return cfg
 
 
-if __name__ == "__main__":
-    main()
+# if __name__ == "__main__":
+#     read()
 
 
 

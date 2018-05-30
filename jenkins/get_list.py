@@ -24,7 +24,7 @@ import print_table
 #####################
 # Checking the configuration
 #####################
-cfg = read_config.main()
+cfg = read_config.read()
 if cfg:
     j_url = cfg['jenkins_url']
     user = cfg['user']
@@ -44,12 +44,11 @@ except KeyError, exc:
     sys.exit(1)
 
 
-def rec_checker(api_ans):
+def rec_checker(api_ans, depth):
     '''
     gets json as a parametr
     returns list of jobs
     '''
-    global depth
     if not isinstance(api_ans, dict):
         print(type(api_ans))
         return None
@@ -66,11 +65,11 @@ def rec_checker(api_ans):
                 if contents['primaryView'] in contents['views']:  # we have url on view itself in view field in folder
                     contents['views'].remove(contents['primaryView'])  # json output so we need to remove it
                     del contents['primaryView']
-                rec_checker(contents)
+                rec_checker(contents, depth)
     if 'views' in api_ans:
         for view in api_ans['views']:
             nested = requests.get(view['url'] + '/api/json', auth=(user, token))
-            rec_checker(json.loads(nested.text))
+            rec_checker(json.loads(nested.text), depth)
     return jobs
 
 
@@ -79,7 +78,7 @@ main_url = j_url + '/view/' + view
 main_view = requests.get(main_url + '/api/json', auth=(user, token))
 views = json.loads(main_view.text)
 jobs = []
-jobs = rec_checker(views)
+jobs = rec_checker(views, depth)
 t_headers = ['Job name', 'Job url', "Matched with {}".format(job_conf_template)]
 t_items = []
 if job_name_template != '' and job_conf_template != '':
