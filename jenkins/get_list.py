@@ -13,9 +13,7 @@ job_conf_template: '(?<=you can use ahead search\>)[\w\d\.]+' # if you want a li
 search_depth: 3 # how far do you want to go through folders and views
 '''
 
-
-import getpass
-import yaml
+import read_config
 import sys
 import re
 import requests
@@ -24,33 +22,26 @@ import print_table
 
 
 #####################
-# Reading the configuration
+# Checking the configuration
 #####################
-try:
-    with open("config.yml", 'r') as ymlfile:
-        cfg = yaml.load(ymlfile)
-except IOError:
-    print('Can not find config.yml in the current directory')
+cfg = read_config.main()
+if cfg:
+    j_url = cfg['jenkins_url']
+    user = cfg['user']
+    token = cfg['token']
+else:
+    print('Missing some mandatory parameters')
     sys.exit(1)
 
-# jenkins url must be in config
 try:
-    j_url = cfg['jenkins_url']
     view = cfg['view']
     job_name_template = cfg['job_name_template']
     job_conf_template = cfg['job_conf_template']
     depth = cfg['search_depth']
 except KeyError, exc:
-    print("No such option in config.yml - {}\nIf it is a template and you dont need it - set it as empty line".format(str(exc)))
+    print("No such option in config.yml - {}\nIf it is a template and you dont need it - set it as empty line"
+          .format(str(exc)))
     sys.exit(1)
-
-try:
-    user = cfg['user']
-    token = cfg['token']
-except KeyError: #if not in config, could be provided via stdin
-    print('Missing username and\or password in config. Please provide it via stdin.')
-    user = raw_input('User: ')
-    token = getpass.getpass()
 
 
 def rec_checker(api_ans):
